@@ -1,4 +1,5 @@
 ﻿using Both.Data;
+using Both.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Both.Services;

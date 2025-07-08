@@ -1,4 +1,5 @@
 ﻿using Telegram.Bot;
+using Both.Models;
 using Telegram.Bot.Types;
 using System.Threading.Tasks;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -22,7 +23,7 @@ namespace Both.Services
             switch (user.Step)
             {
                 case 0:
-                    await bot.SendMessage(chatId,
+                    await bot.SendTextMessageAsync(chatId,
                         $"Привет, {message.From?.FirstName ?? "друг"}! Меня зовут Dobby 🤖\n" +
                         "Я твой персональный ассистент.\n\n➡️ Как тебя зовут?");
                     user.Step = 1;
@@ -30,7 +31,7 @@ namespace Both.Services
 
                 case 1:
                     user.Name = text;
-                    await bot.SendMessage(chatId, "📆 Сколько тебе лет?", replyMarkup: GetNumberKeyboard());
+                    await bot.SendTextMessageAsync(chatId, "📆 Сколько тебе лет?", replyMarkup: GetNumberKeyboard());
                     user.Step = 2;
                     break;
 
@@ -38,48 +39,53 @@ namespace Both.Services
                     if (int.TryParse(text, out int age))
                     {
                         user.Age = age;
-                        await bot.SendMessage(chatId,
+                        await bot.SendTextMessageAsync(chatId,
                             "💡 Как ты хочешь использовать помощника?\n" +
                             "1. 📅 Ежедневное планирование\n2. 📈 Финансовый учёт\n3. 🧠 Личное развитие\n4. 📊 Всё вместе");
                         user.Step = 3;
                     }
                     else
                     {
-                        await bot.SendMessage(chatId, "❌ Введи возраст числом.");
+                        await bot.SendTextMessageAsync(chatId, "❌ Введи возраст числом.");
                     }
                     break;
 
                 case 3:
                     user.GoalType = text;
-                    await bot.SendMessage(chatId,
+                    await bot.SendTextMessageAsync(chatId,
                         "💰 У тебя стабильный доход?\n1. Да\n2. Нет\n3. Пока нет дохода");
                     user.Step = 4;
                     break;
 
                 case 4:
                     user.IncomeStatus = text;
-                    await bot.SendMessage(chatId,
+                    await bot.SendTextMessageAsync(chatId,
                         "⏰ В какое время тебе удобно получать напоминания? (например: 08:00)");
                     user.Step = 5;
                     break;
 
                 case 5:
                     user.ReminderTime = text;
-                    await bot.SendMessage(chatId,
+                    await bot.SendTextMessageAsync(chatId,
                         "🌍 Выбери язык (язык можно изменить позже)",
                         replyMarkup: GetLanguageKeyboard());
                     user.Step = 6;
                     break;
 
                 case 6:
-                    user.Language = text;
-                    await bot.SendMessage(chatId,
+                    user.Language = text switch
+                    {
+                        "Русский" => Language.RU,
+                        "Türkçe" => Language.TR,
+                        _ => Language.EN
+                    };
+                    await bot.SendTextMessageAsync(chatId,
                         $"✅ Готово, {user.Name}!\nЯ запомнил всё и готов помогать 🧠");
                     user.Step = 999;
                     break;
 
                 default:
-                    await bot.SendMessage(chatId,
+                    await bot.SendTextMessageAsync(chatId,
                         $"👋 Привет снова, {user.Name}! Напиши /help чтобы продолжить.");
                     break;
             }
