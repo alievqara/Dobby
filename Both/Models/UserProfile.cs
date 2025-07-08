@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+namespace Both.Models;
 
 public class UserProfile
 {
@@ -17,5 +18,5 @@ public class UserProfile
 
     public string? ReminderTime { get; set; }
 
-    public string? Language { get; set; }
+    public Language Language { get; set; } = Language.EN;
 }
